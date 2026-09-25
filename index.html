@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="screen-orientation" content="landscape">
+    <meta name="x5-orientation" content="landscape">
+    <meta name="full-screen" content="yes">
+    <title>King's League MENA - 3D</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- رسالة "لف الموبايل" -->
+    <div id="rotate-device">
+        <div class="rotate-icon">📱↻</div>
+        <h2>لف الموبايل بالعرض</h2>
+        <p>اللعبة تعمل بشكل أفضل في الوضع الأفقي (Landscape)</p>
+    </div>
+
+    <!-- شاشة التحميل -->
+    <div id="loading">
+        <img src="https://i.supaimg.com/51fed601-7bff-487e-8197-3189211d9777/881ef962-8370-4d85-9582-7f153108d6cd.webp" 
+             alt="KL MENA" id="logo-loading">
+        <div class="spinner"></div>
+        <p>جاري التحميل...</p>
+    </div>
+
+    <!-- حاوية اللعبة -->
+    <div id="game-container"></div>
+
+    <!-- HUD - لوحة المعلومات -->
+    <div id="hud" class="hidden">
+        <!-- النتيجة (فوق في المنتصف - زي FIFA) -->
+        <div id="scoreboard">
+            <div class="team team-home">
+                <img id="home-logo" src="" alt="">
+                <span id="home-name">RA2 FC</span>
+            </div>
+            <div class="score">
+                <span id="home-score">0</span>
+                <span class="separator">-</span>
+                <span id="away-score">0</span>
+            </div>
+            <div class="team team-away">
+                <img id="away-logo" src="" alt="">
+                <span id="away-name">DR7 FC</span>
+            </div>
+        </div>
+
+        <!-- الوقت (فوق يمين) -->
+        <div id="timer">
+            <div id="half-indicator">الشوط الأول</div>
+            <div id="time-display">00:00</div>
+        </div>
+
+        <!-- نوع الكرة (تحت النتيجة) -->
+        <div id="ball-type">⚽ كرة عادية</div>
+
+        <!-- عداد البطاقات النشطة (تحت الوقت) -->
+        <div id="active-cards" class="hidden">
+            <span>🃏</span>
+        </div>
+    </div>
+
+    <!-- أزرار التحكم -->
+    <div id="controls" class="hidden">
+        <!-- أنالوج يسار (تحريك اللاعب) -->
+        <div id="joystick-left">
+            <div id="joystick-base"></div>
+            <div id="joystick-knob"></div>
+        </div>
+
+        <!-- أزرار يمين (أكشن) -->
+        <div id="action-buttons">
+            <button class="btn-action btn-1" data-btn="1">
+                <span class="btn-num">١</span>
+                <span class="btn-label" id="label-1">جري</span>
+            </button>
+            <button class="btn-action btn-2" data-btn="2">
+                <span class="btn-num">٢</span>
+                <span class="btn-label" id="label-2">تسديد</span>
+            </button>
+            <button class="btn-action btn-3" data-btn="3">
+                <span class="btn-num">٣</span>
+                <span class="btn-label" id="label-3">تمرير</span>
+            </button>
+            <button class="btn-action btn-4" data-btn="4">
+                <span class="btn-num">٤</span>
+                <span class="btn-label" id="label-4">مهارات</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- زر البطاقات السرية (يسار فوق) -->
+    <button id="btn-weapons" class="hidden">
+        <span>🃏</span>
+        <small>الأسلحة</small>
+    </button>
+
+    <!-- زر الإيقاف المؤقت (يمين فوق) -->
+    <button id="btn-pause" class="hidden">
+        <span>⏸</span>
+    </button>
+
+    <!-- Three.js من CDN -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+    </script>
+    <script type="module" src="main.js"></script>
+  <script type="module" src="src/main.js"></script>
+  <script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+  
+</body>
+</html>
