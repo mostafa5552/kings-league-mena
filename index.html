@@ -8,8 +8,20 @@
     <meta name="screen-orientation" content="landscape">
     <meta name="x5-orientation" content="landscape">
     <meta name="full-screen" content="yes">
-    <title>King's League MENA - 3D</title>
+    <title>King's League MENA - 3D Football</title>
     <link rel="stylesheet" href="style.css">
+
+    <!-- ============================================
+         importmap - لازم يكون في <head> وقبل أي script module
+         ============================================ -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+    </script>
 </head>
 <body>
     <!-- رسالة "لف الموبايل" -->
@@ -24,15 +36,15 @@
         <img src="https://i.supaimg.com/51fed601-7bff-487e-8197-3189211d9777/881ef962-8370-4d85-9582-7f153108d6cd.webp" 
              alt="KL MENA" id="logo-loading">
         <div class="spinner"></div>
-        <p>جاري التحميل...</p>
+        <p id="loading-status">جاري التحميل...</p>
+        <p id="loading-error" style="color: #ff4444; font-size: 12px; margin-top: 10px; max-width: 80%; text-align: center;"></p>
     </div>
 
     <!-- حاوية اللعبة -->
     <div id="game-container"></div>
 
-    <!-- HUD - لوحة المعلومات -->
+    <!-- HUD -->
     <div id="hud" class="hidden">
-        <!-- النتيجة (فوق في المنتصف - زي FIFA) -->
         <div id="scoreboard">
             <div class="team team-home">
                 <img id="home-logo" src="" alt="">
@@ -49,16 +61,13 @@
             </div>
         </div>
 
-        <!-- الوقت (فوق يمين) -->
         <div id="timer">
             <div id="half-indicator">الشوط الأول</div>
             <div id="time-display">00:00</div>
         </div>
 
-        <!-- نوع الكرة (تحت النتيجة) -->
         <div id="ball-type">⚽ كرة عادية</div>
 
-        <!-- عداد البطاقات النشطة (تحت الوقت) -->
         <div id="active-cards" class="hidden">
             <span>🃏</span>
         </div>
@@ -66,13 +75,11 @@
 
     <!-- أزرار التحكم -->
     <div id="controls" class="hidden">
-        <!-- أنالوج يسار (تحريك اللاعب) -->
         <div id="joystick-left">
             <div id="joystick-base"></div>
             <div id="joystick-knob"></div>
         </div>
 
-        <!-- أزرار يمين (أكشن) -->
         <div id="action-buttons">
             <button class="btn-action btn-1" data-btn="1">
                 <span class="btn-num">١</span>
@@ -93,38 +100,56 @@
         </div>
     </div>
 
-    <!-- زر البطاقات السرية (يسار فوق) -->
+    <!-- زر الأسلحة السرية -->
     <button id="btn-weapons" class="hidden">
         <span>🃏</span>
         <small>الأسلحة</small>
     </button>
 
-    <!-- زر الإيقاف المؤقت (يمين فوق) -->
+    <!-- زر الإيقاف المؤقت -->
     <button id="btn-pause" class="hidden">
         <span>⏸</span>
     </button>
 
-    <!-- Three.js من CDN -->
-    <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-      }
-    }
+    <!-- ============================================
+         Eruda Console (للتشخيص)
+         ============================================ -->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+        try {
+            if (window.eruda) {
+                eruda.init({
+                    tool: ['console', 'network', 'elements', 'resources']
+                });
+            }
+        } catch(e) {
+            console.warn('Eruda failed to load:', e);
+        }
+
+        // Global Error Handler - لرؤية أي خطأ
+        window.addEventListener('error', (e) => {
+            console.error('❌ GLOBAL ERROR:', e.message, '| File:', e.filename, '| Line:', e.lineno);
+            const el = document.getElementById('loading-error');
+            if (el) el.textContent = 'خطأ: ' + e.message;
+            const st = document.getElementById('loading-status');
+            if (st) st.textContent = 'فشل التحميل';
+        });
+
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('❌ PROMISE REJECTION:', e.reason);
+            const el = document.getElementById('loading-error');
+            if (el) el.textContent = 'خطأ: ' + (e.reason?.message || e.reason);
+            const st = document.getElementById('loading-status');
+            if (st) st.textContent = 'فشل التحميل';
+        });
+
+        console.log('✅ index.html initialized');
     </script>
-    <script type="module" src="main.js"></script>
-  <script type="module" src="src/main.js"></script>
-  <script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
-  <!-- Eruda Console للتشخيص -->
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
+
+    <!-- ============================================
+         main.js - آخر عنصر في body
+         ⚠️ لازم يكون src/main.js (مع src/)
+         ============================================ -->
+    <script type="module" src="src/main.js"></script>
 </body>
 </html>
