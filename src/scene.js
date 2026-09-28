@@ -1,6 +1,3 @@
-// ============================================
-// scene.js - إعداد Three.js الأساسي
-// ============================================
 import * as THREE from 'three';
 
 export let scene, renderer, clock;
