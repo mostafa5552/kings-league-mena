@@ -1,5 +1,5 @@
 // ============================================
-// team.js - إدارة الفريق مع Rosters الحقيقية
+// team.js - إدارة الفريق
 // ============================================
 import * as THREE from 'three';
 import { Player } from './player.js';
@@ -21,16 +21,12 @@ export class Team {
         this.players = [];
         this.activeCount = 0;
         this.score = 0;
-        this.hasColoredBallBonus = false;
         this.doubleGoalEndTime = 0;
         this.starPlayerIndex = -1;
 
         this.formation = this.getFormation();
     }
 
-    // ============================================
-    // خطة 7 لاعبين (مواقع نسبية)
-    // ============================================
     getFormation() {
         const dir = this.defendDir;
         return [
@@ -48,14 +44,11 @@ export class Team {
         }));
     }
 
-    // ============================================
-    // إنشاء اللاعبين من الـ Roster الحقيقي
-    // ============================================
     createPlayers() {
         const startingSeven = selectStartingSeven(this.id);
         
         if (!startingSeven || startingSeven.length === 0) {
-            console.warn(`⚠️ لا يوجد roster للفريق ${this.id} - استخدام fallback`);
+            console.warn(`⚠️ لا يوجد roster للفريق ${this.id}`);
             return this.createFallbackPlayers();
         }
 
@@ -79,7 +72,6 @@ export class Team {
                 playerInfo
             );
             
-            // موضع الحساب - f هو object {x, z, isGK}
             const x = f.x * FIELD.length / 2;
             const z = f.z * FIELD.width / 2;
             
@@ -88,8 +80,7 @@ export class Team {
             if (isGK) {
                 player.isGoalkeeper = true;
                 player.homePosition = new THREE.Vector3(
-                    this.defendDir * (FIELD.length / 2 - 1.5),
-                    0, 0
+                    this.defendDir * (FIELD.length / 2 - 1.5), 0, 0
                 );
             } else {
                 player.homePosition = new THREE.Vector3(x, 0, z);
@@ -98,18 +89,13 @@ export class Team {
             this.players.push(player);
         }
 
-        // البدلاء
         const fullRoster = getTeamRoster(this.id);
-        const substitutes = fullRoster.filter(p => !startingSeven.includes(p));
-        this.substitutes = substitutes;
-        console.log(`  👥 ${substitutes.length} بدلاء متاحين`);
+        this.substitutes = fullRoster.filter(p => !startingSeven.includes(p));
+        console.log(`  👥 ${this.substitutes.length} بدلاء`);
 
         this.setActiveCount(0);
     }
 
-    // ============================================
-    // fallback لو مفيش roster
-    // ============================================
     createFallbackPlayers() {
         for (let i = 0; i < 7; i++) {
             const f = this.formation[i];
@@ -117,11 +103,9 @@ export class Team {
             const isGK = f.isGK;
             
             const player = new Player(
-                this.scene,
-                this.id,
+                this.scene, this.id,
                 { ...this.data, primary: this.kit },
-                i + 1,
-                isGK,
+                i + 1, isGK,
                 { number: i + 1, name: `Player ${i + 1}`, position: isGK ? 'GK' : 'MID' }
             );
             
@@ -144,16 +128,11 @@ export class Team {
         this.setActiveCount(0);
     }
 
-    // ============================================
-    // التحكم في عدد اللاعبين النشطين
-    // ============================================
     setActiveCount(count) {
         this.activeCount = Math.min(count, 7);
         
         this.players.forEach((p, i) => {
-            const isGK = p.isGK;
-            
-            if (isGK) {
+            if (p.isGK) {
                 p.group.visible = true;
                 p.active = true;
             } else {
@@ -172,15 +151,15 @@ export class Team {
         return this.players.find(p => p.isGK);
     }
 
-    getClosestPlayerTo(position) {
+    getClosestPlayerTo(pos) {
         const active = this.getActivePlayers().filter(p => !p.isGK);
         if (active.length === 0) return null;
         
         let closest = active[0];
-        let minDist = active[0].distanceTo(position);
+        let minDist = active[0].distanceTo(pos);
         
         for (let i = 1; i < active.length; i++) {
-            const d = active[i].distanceTo(position);
+            const d = active[i].distanceTo(pos);
             if (d < minDist) {
                 minDist = d;
                 closest = active[i];
