@@ -29,18 +29,18 @@ export class Team {
     }
 
     // ============================================
-    // خطة 7 لاعبين
+    // خطة 7 لاعبين (مواقع نسبية)
     // ============================================
     getFormation() {
         const dir = this.defendDir;
         return [
-            { x: 0.95, z: 0, isGK: true },
-            { x: 0.6, z: -0.4, isGK: false },
-            { x: 0.6, z: 0.4, isGK: false },
+            { x: 0.95, z: 0,    isGK: true  },
+            { x: 0.6,  z: -0.4, isGK: false },
+            { x: 0.6,  z: 0.4,  isGK: false },
             { x: 0.25, z: -0.55, isGK: false },
             { x: 0.25, z: 0.55, isGK: false },
             { x: -0.1, z: -0.2, isGK: false },
-            { x: -0.1, z: 0.2, isGK: false },
+            { x: -0.1, z: 0.2,  isGK: false },
         ].map(p => ({
             x: p.x * dir,
             z: p.z,
@@ -53,9 +53,8 @@ export class Team {
     // ============================================
     createPlayers() {
         const startingSeven = selectStartingSeven(this.id);
-        const fullRoster = getTeamRoster(this.id);
-
-        if (startingSeven.length === 0) {
+        
+        if (!startingSeven || startingSeven.length === 0) {
             console.warn(`⚠️ لا يوجد roster للفريق ${this.id} - استخدام fallback`);
             return this.createFallbackPlayers();
         }
@@ -67,6 +66,8 @@ export class Team {
             if (!playerInfo) continue;
 
             const f = this.formation[i];
+            if (!f) continue;
+
             const isGK = playerInfo.position === 'GK';
 
             const player = new Player(
@@ -78,6 +79,7 @@ export class Team {
                 playerInfo
             );
             
+            // موضع الحساب - f هو object {x, z, isGK}
             const x = f.x * FIELD.length / 2;
             const z = f.z * FIELD.width / 2;
             
@@ -96,7 +98,8 @@ export class Team {
             this.players.push(player);
         }
 
-        // تخزين البدلاء (للاستخدام لاحقاً)
+        // البدلاء
+        const fullRoster = getTeamRoster(this.id);
         const substitutes = fullRoster.filter(p => !startingSeven.includes(p));
         this.substitutes = substitutes;
         console.log(`  👥 ${substitutes.length} بدلاء متاحين`);
@@ -110,6 +113,7 @@ export class Team {
     createFallbackPlayers() {
         for (let i = 0; i < 7; i++) {
             const f = this.formation[i];
+            if (!f) continue;
             const isGK = f.isGK;
             
             const player = new Player(
@@ -153,7 +157,7 @@ export class Team {
                 p.group.visible = true;
                 p.active = true;
             } else {
-                const isActive = (i < this.activeCount) || (isGK && this.activeCount > 0);
+                const isActive = (i < this.activeCount);
                 p.active = isActive;
                 p.group.visible = isActive;
             }
@@ -188,6 +192,7 @@ export class Team {
     resetPositions() {
         this.players.forEach((p, i) => {
             const f = this.formation[i];
+            if (!f) return;
             const x = f.x * FIELD.length / 2;
             const z = f.z * FIELD.width / 2;
             p.reset(x, z, new THREE.Vector3(this.attackDir, 0, 0));
