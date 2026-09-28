@@ -6,10 +6,12 @@ import * as THREE from 'three';
 export let scene, renderer, clock;
 
 export function initScene() {
+    // ---------- Scene ----------
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x050510);
     scene.fog = new THREE.Fog(0x050510, 50, 150);
 
+    // ---------- Renderer ----------
     renderer = new THREE.WebGLRenderer({
         antialias: true,
         powerPreference: 'high-performance'
@@ -21,6 +23,7 @@ export function initScene() {
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.2;
 
+    // ---------- إضافة Canvas ----------
     const container = document.getElementById('game-container');
     if (container) {
         container.appendChild(renderer.domElement);
@@ -28,8 +31,10 @@ export function initScene() {
         document.body.appendChild(renderer.domElement);
     }
 
+    // ---------- Clock ----------
     clock = new THREE.Clock();
 
+    // ---------- Events ----------
     window.addEventListener('resize', onResize);
     window.addEventListener('orientationchange', onResize);
 
