@@ -1,9 +1,9 @@
 // ============================================
-// team.js - إدارة الفريق
+// team.js - نسخة مبسطة للاختبار
 // ============================================
 import * as THREE from 'three';
 import { Player } from './player.js';
-import { FIELD, getTeamRoster, selectStartingSeven } from './config.js';
+import { FIELD } from './config.js';
 
 export class Team {
     constructor(scene, teamId, teamData, side, useSecondary = false) {
@@ -23,97 +23,45 @@ export class Team {
         this.score = 0;
         this.doubleGoalEndTime = 0;
         this.starPlayerIndex = -1;
-
-        this.formation = this.getFormation();
     }
 
-    getFormation() {
-        const dir = this.defendDir;
-        return [
-            { x: 0.95, z: 0,    isGK: true  },
-            { x: 0.6,  z: -0.4, isGK: false },
-            { x: 0.6,  z: 0.4,  isGK: false },
-            { x: 0.25, z: -0.55, isGK: false },
-            { x: 0.25, z: 0.55, isGK: false },
-            { x: -0.1, z: -0.2, isGK: false },
-            { x: -0.1, z: 0.2,  isGK: false },
-        ].map(p => ({
-            x: p.x * dir,
-            z: p.z,
-            isGK: p.isGK
-        }));
-    }
-
+    // ============================================
+    // إنشاء اللاعبين (7 لاعبين ثابتين بأرقام بسيطة)
+    // ============================================
     createPlayers() {
-        const startingSeven = selectStartingSeven(this.id);
-        
-        if (!startingSeven || startingSeven.length === 0) {
-            console.warn(`⚠️ لا يوجد roster للفريق ${this.id}`);
-            return this.createFallbackPlayers();
-        }
+        console.log(`⚽ فريق ${this.id}: إنشاء 7 لاعبين`);
 
-        console.log(`⚽ فريق ${this.id}: إنشاء ${startingSeven.length} لاعبين`);
+        // مواضع ثابتة لكل فريق
+        const positions = [
+            { x: 0.95, z: 0,    isGK: true  },   // حارس
+            { x: 0.60, z: -0.40, isGK: false },  // مدافع 1
+            { x: 0.60, z: 0.40,  isGK: false },  // مدافع 2
+            { x: 0.25, z: -0.55, isGK: false },  // وسط 1
+            { x: 0.25, z: 0.55,  isGK: false },  // وسط 2
+            { x: -0.10, z: -0.20, isGK: false }, // مهاجم 1
+            { x: -0.10, z: 0.20,  isGK: false }, // مهاجم 2
+        ];
 
         for (let i = 0; i < 7; i++) {
-            const playerInfo = startingSeven[i];
-            if (!playerInfo) continue;
+            const pos = positions[i];
+            const isGK = pos.isGK;
 
-            const f = this.formation[i];
-            if (!f) continue;
+            // حساب الموضع الحقيقي
+            const x = pos.x * this.defendDir * FIELD.length / 2;
+            const z = pos.z * FIELD.width / 2;
 
-            const isGK = playerInfo.position === 'GK';
-
+            // إنشاء اللاعب
             const player = new Player(
                 this.scene,
                 this.id,
                 { ...this.data, primary: this.kit },
-                playerInfo.number,
+                i + 1,
                 isGK,
-                playerInfo
-            );
-            
-            const x = f.x * FIELD.length / 2;
-            const z = f.z * FIELD.width / 2;
-            
-            player.reset(x, z, new THREE.Vector3(this.attackDir, 0, 0));
-            
-            if (isGK) {
-                player.isGoalkeeper = true;
-                player.homePosition = new THREE.Vector3(
-                    this.defendDir * (FIELD.length / 2 - 1.5), 0, 0
-                );
-            } else {
-                player.homePosition = new THREE.Vector3(x, 0, z);
-            }
-            
-            this.players.push(player);
-        }
-
-        const fullRoster = getTeamRoster(this.id);
-        this.substitutes = fullRoster.filter(p => !startingSeven.includes(p));
-        console.log(`  👥 ${this.substitutes.length} بدلاء`);
-
-        this.setActiveCount(0);
-    }
-
-    createFallbackPlayers() {
-        for (let i = 0; i < 7; i++) {
-            const f = this.formation[i];
-            if (!f) continue;
-            const isGK = f.isGK;
-            
-            const player = new Player(
-                this.scene, this.id,
-                { ...this.data, primary: this.kit },
-                i + 1, isGK,
                 { number: i + 1, name: `Player ${i + 1}`, position: isGK ? 'GK' : 'MID' }
             );
-            
-            const x = f.x * FIELD.length / 2;
-            const z = f.z * FIELD.width / 2;
-            
+
             player.reset(x, z, new THREE.Vector3(this.attackDir, 0, 0));
-            
+
             if (isGK) {
                 player.isGoalkeeper = true;
                 player.homePosition = new THREE.Vector3(
@@ -122,9 +70,10 @@ export class Team {
             } else {
                 player.homePosition = new THREE.Vector3(x, 0, z);
             }
-            
+
             this.players.push(player);
         }
+
         this.setActiveCount(0);
     }
 
@@ -170,10 +119,21 @@ export class Team {
 
     resetPositions() {
         this.players.forEach((p, i) => {
-            const f = this.formation[i];
-            if (!f) return;
-            const x = f.x * FIELD.length / 2;
-            const z = f.z * FIELD.width / 2;
+            // نستخدم نفس المواضع
+            const positions = [
+                { x: 0.95, z: 0,    isGK: true  },
+                { x: 0.60, z: -0.40, isGK: false },
+                { x: 0.60, z: 0.40,  isGK: false },
+                { x: 0.25, z: -0.55, isGK: false },
+                { x: 0.25, z: 0.55,  isGK: false },
+                { x: -0.10, z: -0.20, isGK: false },
+                { x: -0.10, z: 0.20,  isGK: false },
+            ];
+            const pos = positions[i];
+            if (!pos) return;
+            
+            const x = pos.x * this.defendDir * FIELD.length / 2;
+            const z = pos.z * FIELD.width / 2;
             p.reset(x, z, new THREE.Vector3(this.attackDir, 0, 0));
         });
     }
